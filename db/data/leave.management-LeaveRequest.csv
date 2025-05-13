@@ -1,0 +1,5 @@
+ID;employee_ID;type_code;startDate;endDate;reason;status;approver_ID
+req1;emp1;ANNUAL;2025-06-10;2025-06-14;Vacation trip;Pending;emp2
+req2;emp1;SICK;2025-05-10;2025-05-11;Flu;Approved;emp2
+req3;emp2;SICK;2025-05-10;2025-05-11;Flu;Approved;emp3
+req4;emp3;SICK;2025-05-10;2025-05-11;Flu;Approved;emp4

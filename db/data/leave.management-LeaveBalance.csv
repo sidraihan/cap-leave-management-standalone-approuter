@@ -1,0 +1,6 @@
+ID;employee_ID;type_code;balance
+bal1;emp1;ANNUAL;12
+bal2;emp1;SICK;5
+bal3;emp2;ANNUAL;10
+bal4;emp2;SICK;6
+bal5;emp3;SICK;8
