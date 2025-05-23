@@ -1,7 +1,8 @@
 namespace leave.management;
 using { cuid,managed,sap.common.CodeList } from '@sap/cds/common';
 
-entity Employee : cuid,managed {
+entity Employee : managed {
+    key ID : String(100);
     name: String(100);
     email: String(100);
     role: String (20); //Employee, Manager, Admin -> Raihan: Will use this later for role based access
@@ -10,18 +11,16 @@ entity Employee : cuid,managed {
     balances: Composition of many LeaveBalance on balances.employee = $self;
 }
 
-entity LeaveRequest : cuid, managed {
+entity LeaveRequest :cuid,managed {
+    //key ID: String(25);
     employee: Association to Employee;
     type: Association to LeaveType;
     startDate: Date;
     endDate: Date;
     reason: String(255);
-    status: String enum{
-        Pending;
-        Approved;
-        Rejected;
-    };
+    status: Association to LeaveRequestStatus;
     approver: Association to Employee;
+    virtual isPending : Boolean;
 }
 
 entity LeaveBalance : cuid,managed {
@@ -33,6 +32,21 @@ entity LeaveBalance : cuid,managed {
 
 entity LeaveType : CodeList {
     key code: String(10);
-    name: localized String(50);
-    description: localized String(50);
+    name: String(100);
+}
+
+// entity LeaveType : CodeList {
+//     key code: String enum{
+//          Annual= 'AL';
+//          Sick = 'SL';
+//          Unpaid = 'UL';
+//          Maternity = 'ML';
+//          Paternity = 'PL';
+//          Bereavement = 'BL';
+        
+//     };
+// }
+
+entity LeaveRequestStatus : CodeList{
+    key code: String(25)
 }

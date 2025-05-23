@@ -1,0 +1,121 @@
+{
+  "_version": "1.12.0",
+  "sap.app": {
+    "id": "leave.management",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/leave/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "rootView": {
+      "viewName": "leave.management.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "app"
+    },
+    "dependencies": {
+      "minUI5Version": "1.71",
+      "libs": {
+        "sap.ui.core": {},
+        "sap.m": {},
+        "sap.ui.layout": {}
+      }
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "leave.management.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "type": "sap.ui.model.odata.v4.ODataModel",
+        "settings": {
+        "synchronizationMode": "None",
+        "operationMode": "Server"
+    }
+      }
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "viewPath": "leave.management.view",
+        "controlId": "app",
+        "controlAggregation": "pages",
+        "async": true
+      },
+      "routes": [
+        {
+          "pattern": "",
+          "name": "home",
+          "target": "home"
+        },
+        {
+          "pattern": "leaveRequests",
+          "name": "leaveRequests",
+          "target": "leaveRequests"
+        },
+        {
+          "pattern": "createLeaveRequest",
+          "name": "createLeaveRequest",
+          "target": "createLeaveRequest"
+        },
+        {
+          "pattern": "leaveBalances",
+          "name": "leaveBalances",
+          "target": "leaveBalances"
+        },
+        {
+          "pattern": "approvalLeaveRequests",
+          "name": "approvalLeaveRequests",
+          "target": "approvalLeaveRequests"
+        }
+      ],
+      "targets": {
+        "home": {
+          "viewName": "Home",
+          "viewLevel": 1
+        },
+        "leaveRequests": {
+          "viewName": "LeaveRequests",
+          "viewLevel": 1
+        },
+        "createLeaveRequest": {
+          "viewName": "CreateLeaveRequest",
+          "viewLevel": 2
+        },
+        "leaveBalances": {
+          "viewName": "LeaveBalances",
+          "viewLevel": 2
+        },
+        "approvalLeaveRequests": {
+          "viewName": "ApprovalRequests",
+          "viewLevel": 2
+        }
+      }
+    }
+  }
+} 

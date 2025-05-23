@@ -1,5 +1,7 @@
-code;name;description
-ANNUAL;Annual Leave;Standard annual paid time off
-SICK;Sick Leave;Leave for illness
-UNPAID;Unpaid Leave;Leave without pay
-MATERNITY;Maternity Leave;Leave for meternity
+code;name;
+ANNUAL;Annual Leave
+SICK;Sick Leave
+UNPAID;Unpaid Leave
+MATERNITY;Maternity Leave
+PATERNITY;Paternity Leave
+BEREAVEMENT;Bereavement Leave

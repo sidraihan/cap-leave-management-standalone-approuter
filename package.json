@@ -1,34 +1,42 @@
 {
   "name": "cap-leave-management-app",
   "version": "1.0.0",
-  "description": "A simple CAP project.",
+  "description": "Leave Management Application",
   "repository": "<Add your repository here>",
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
     "@sap/cds": "^8",
+    "@sap/cds-dk": "^8",
+    "@sap/xssec": "^3",
     "express": "^4",
-    "sqlite3": "^5.1.7"
+    "passport": "^0",
+    "sqlite3": "^5"
   },
   "devDependencies": {
-    "@cap-js/cds-types": "^0.10.0",
-    "@cap-js/sqlite": "^1"
+    "@ui5/cli": "^3.0.0",
+    "@sap/cds-dk": "^8",
+    "ui5-middleware-livereload": "^0.8.0"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds run",
+    "watch": "cds watch",
+    "build": "ui5 build",
+    "deploy": "cds build --production && cf push",
+    "ui5:serve": "ui5 serve --config ui5.yaml"
   },
   "cds": {
     "requires": {
       "db": {
-      "kind": "sqlite",
-      "credentials": 
-        { 
-          "url": "db.sqlite" 
-        } 
+        "kind": "sqlite"
       },
       "auth": {
-        "kind": "mocked",
-        "users": {
+        "[production]": {
+          "kind": "xsuaa"
+        },
+        "[development]": {
+          "kind": "mocked",
+          "users": {
           "admin": {
             "password": "admin",
             "roles": [
@@ -46,10 +54,23 @@
             "roles": [
               "Manager",
               "Employee"
-            ]
+              ]
+            },
+            "emp3": {
+            "password": "employee",
+            "roles": [
+              "Manager",
+              "Employee"
+              ]
+            }
           }
         }
       }
     }
+  },
+  "ui5": {
+    "dependencies": [
+      "ui5-middleware-livereload"
+    ]
   }
 }

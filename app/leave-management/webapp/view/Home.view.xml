@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mvc:View
+    controllerName="leave.management.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <FlexBox direction="Row" wrap="Wrap" alignItems="Start" justifyContent="Start"
+        items="{tiles>/tiles}">
+        <GenericTile
+            class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout"
+            header="{tiles>title}"
+            subheader="{tiles>info}"
+            press="onTilePress">
+            <TileContent>
+                <ImageContent src="{tiles>icon}" />
+            </TileContent>
+        </GenericTile>
+    </FlexBox>
+</mvc:View> 
