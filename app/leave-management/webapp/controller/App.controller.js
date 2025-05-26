@@ -34,7 +34,7 @@ sap.ui.define([
                     },
                     {
                         title: "Approvals",
-                        info: "Approve or reject leave requests",
+                        info: "Approve/Reject leave requests",
                         icon: "sap-icon://task",
                         press: this.onApprovalsPress.bind(this)
                     }

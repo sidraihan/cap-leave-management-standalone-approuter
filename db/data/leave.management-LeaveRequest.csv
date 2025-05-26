@@ -1,7 +1,8 @@
-ID;employee_ID;type_code;startDate;endDate;reason;status_code;approver_ID;createdBy;
-a1b2c3d4-e5f6-4789-abcd-ef1234567890;emp1;ANNUAL;2025-06-10;2025-06-14;Vacation trip;Pending;emp2;emp1
-09876543-21fe-4dcg-hikl-mnopqrstuvwx;emp1;SICK;2025-05-10;2025-05-11;Flu;Approved;emp2;emp1
-f0e1d2c3-b4a5-4678-90ab-cdef12345678;emp2;SICK;2025-05-10;2025-05-11;Flu;Approved;emp3;emp2
-5a6b7c8d-9e0f-4123-4567-890abcdef123;emp3;SICK;2025-05-10;2025-05-11;Flu;Approved;emp4;emp3
-11223344-5566-4777-8899-aabbccddeeff;emp1;SICK;2025-07-10;2025-05-11;Flu;Pending;emp2;emp1
-98765432-10fe-4dcb-a987-654321fedcba;emp2;SICK;2025-07-10;2025-07-11;Flu;Approved;emp3;emp2
+ID;employee_ID;type_code;startDate;endDate;reason;status_code;approver_ID;createdBy;numberOfDays;
+a1b2c3d4-e5f6-4789-abcd-ef1234567890;emp1;ANNUAL;2025-06-10;2025-06-14;Vacation trip;Pending;emp2;emp1;4
+09876543-21fe-4dcg-hikl-mnopqrstuvwx;emp1;SICK;2025-05-10;2025-05-11;Flu;Approved;emp2;emp1;2
+f0e1d2c3-b4a5-4678-90ab-cdef12345678;emp2;SICK;2025-05-10;2025-05-11;Flu;Approved;emp3;emp2;2
+5a6b7c8d-9e0f-4123-4567-890abcdef123;emp3;SICK;2025-05-10;2025-05-11;Flu;Approved;emp4;emp3;2
+11223344-5566-4777-8899-aabbccddeeff;emp1;SICK;2025-07-10;2025-05-11;Flu;Pending;emp2;emp1;2
+98765432-10fe-4dcb-a987-654321fedcba;emp2;SICK;2025-07-10;2025-07-11;Flu;Approved;emp3;emp2;2
+12345678-90ab-4cd1-2345-67890abcdef123;emp4;SICK;2025-07-10;2025-07-11;Flu;Pending;emp3;emp3;2

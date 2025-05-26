@@ -88,6 +88,7 @@ sap.ui.define([
                 MessageBox.success("Leave request created successfully", {
                     onClose: () => {
                         this.onNavBack();
+                        oModel.refresh(); // Refresh model so that the latest balance is reflected in the Leave Balance view
                     }
                 });
             } catch (error) {

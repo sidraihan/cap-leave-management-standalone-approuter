@@ -25,7 +25,8 @@
       "desktop": true,
       "tablet": true,
       "phone": true
-    }
+    },
+    "supportedThemes": ["sap_horizon"]
   },
   "sap.ui5": {
     "rootView": {
@@ -116,6 +117,13 @@
           "viewLevel": 2
         }
       }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
     }
   }
 } 

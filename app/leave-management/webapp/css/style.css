@@ -1,0 +1,36 @@
+.homeBackground {
+    background-image: url('../images/leaves-pattern.svg');
+    background-repeat: repeat;
+    background-size: 400px;
+    background-color: #f7f7f7;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.contentWrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.tileLayout {
+    height: auto !important;
+}
+
+.tileLayout .sapMGTHdrTxt {
+    white-space: normal !important;
+}
+
+.tileLayout .sapMGTSubHdrTxt {
+    white-space: normal !important;
+    height: auto !important;
+}
+
+.customDivider {
+    height: 2px !important;
+    background: linear-gradient(to right, transparent, #0854a0, transparent) !important;
+} 

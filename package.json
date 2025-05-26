@@ -9,13 +9,14 @@
     "@sap/cds": "^8",
     "@sap/cds-dk": "^8",
     "@sap/xssec": "^3",
+    "date-fns": "^4.1.0",
     "express": "^4",
     "passport": "^0",
     "sqlite3": "^5"
   },
   "devDependencies": {
-    "@ui5/cli": "^3.0.0",
     "@sap/cds-dk": "^8",
+    "@ui5/cli": "^3.0.0",
     "ui5-middleware-livereload": "^0.8.0"
   },
   "scripts": {
@@ -37,30 +38,36 @@
         "[development]": {
           "kind": "mocked",
           "users": {
-          "admin": {
-            "password": "admin",
-            "roles": [
-              "Admin"
-            ]
-          },
-          "emp1": {
-            "password": "employee",
-            "roles": [
-              "Employee"
-            ]
-          },
-          "emp2": {
-            "password": "employee",
-            "roles": [
-              "Manager",
-              "Employee"
+            "admin": {
+              "password": "admin",
+              "roles": [
+                "Admin"
+              ]
+            },
+            "emp1": {
+              "password": "employee",
+              "roles": [
+                "Employee"
+              ]
+            },
+            "emp2": {
+              "password": "employee",
+              "roles": [
+                "Manager",
+                "Employee"
               ]
             },
             "emp3": {
-            "password": "employee",
-            "roles": [
-              "Manager",
-              "Employee"
+              "password": "employee",
+              "roles": [
+                "Manager",
+                "Employee"
+              ]
+            },
+            "emp5": {
+              "password": "employee",
+              "roles": [
+                "Employee"
               ]
             }
           }

@@ -9,60 +9,10 @@ service LeaveService {
         reason    : String
     ) returns Boolean;
 
-    @requires: 'authenticated-user'
-    @restrict: [
-        {
-            grant: 'READ',
-            to: 'Employee',
-            where: 'employee_ID = $user'
-        },
-        {
-            grant: 'CREATE',
-            to: 'Employee'
-        },
-        {
-            grant: 'createLeave',
-            to: 'Employee'
-        },
-        {
-            grant: 'UPDATE',
-            to: 'Employee'
-            //where: 'createdBy = $user'
-        },
-        {
-            grant: 'DELETE',
-            to: 'Employee',
-            where: 'createdBy = $user'
-        },
-        {
-            grant: 'READ',
-            to: 'Manager',
-            where: 'approver_ID = $user'
-        },
-        {
-            grant: 'UPDATE',
-            to: 'Manager'
-            //where: 'approver_ID = $user'
-        },
-        {
-            grant: 'approveRequest',
-            to: 'Manager'
-            //where: 'approver_ID = $user'  //We will check this in the service handler
-        },
-        {
-            grant: 'rejectRequest',
-            to: 'Manager'
-            //where: 'approver_ID = $user'  //We will check this in the service handler
-        },
-        {
-            grant: '*',
-            to: 'Admin'
-        }
-    ]
-    
     @cds.redirection.target entity LeaveRequests as projection on my.LeaveRequest actions{ 
         action approveRequest();
         action rejectRequest();
+        action cancelRequest() returns String;
         //function getLeaveRequests @(restrict: ['READ'])() returns my.LeaveRequest;
   };
 
@@ -71,46 +21,23 @@ service LeaveService {
     @restrict: [
         {
             grant: 'READ',
-            to: 'Employee',
-            where: 'employee_ID = $user'
-        },
-        {
-            grant: 'CREATE',
-            to: 'Employee'
-        },
-        {
-            grant: 'createLeave',
-            to: 'Employee'
-        },
-        {
-            grant: 'UPDATE',
-            to: 'Employee'
-            //where: 'createdBy = $user'
-        },
-        {
-            grant: 'DELETE',
-            to: 'Employee',
-            where: 'createdBy = $user'
-        },
-        {
-            grant: 'READ',
             to: 'Manager',
             where: 'approver_ID = $user'
         },
         {
             grant: 'UPDATE',
-            to: 'Manager'
-            //where: 'approver_ID = $user'
+            to: 'Manager',
+            where: 'approver_ID = $user'
         },
         {
             grant: 'approveRequest',
-            to: 'Manager'
-            //where: 'approver_ID = $user'  //We will check this in the service handler
+            to: 'Manager',
+            where: 'approver_ID = $user'  //We will check this in the service handler
         },
         {
             grant: 'rejectRequest',
-            to: 'Manager'
-            //where: 'approver_ID = $user'  //We will check this in the service handler
+            to: 'Manager',
+            where: 'approver_ID = $user'  //We will check this in the service handler
         },
         {
             grant: '*',
@@ -126,9 +53,44 @@ service LeaveService {
     reason,
     status,
     approver,
+    numberOfDays
   };
  // annotate LeaveService.LeaveRequests with @odata.draft.enabled;
-
+ @requires: 'authenticated-user'
+    @restrict: [
+        {
+            grant: 'READ',
+            to: 'Employee',
+            where: 'employee_ID = $user'
+        },
+        {
+            grant: 'CREATE',
+            to: 'Employee'
+        },
+        {
+            grant: 'createLeave',
+            to: 'Employee'
+        },
+        {
+            grant: 'UPDATE',
+            to: 'Employee'
+        },
+        {
+            grant: 'DELETE',
+            to: 'Employee',
+            where: 'createdBy = $user'
+        },
+        {
+            grant: 'cancelRequest',
+            to: 'Employee',
+            where: 'employee_ID = $user'
+        },
+        {
+            grant: '*',
+            to: 'Admin'
+        }
+    ]
+    entity MyLeaveRequests as projection on my.LeaveRequest;
     // Employees and managers can view balances, admins can update them
   @restrict: [
         { 

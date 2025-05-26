@@ -4,3 +4,13 @@ bal2;emp1;SICK;5
 bal3;emp2;ANNUAL;10
 bal4;emp2;SICK;6
 bal5;emp3;SICK;8
+bal6;emp3;ANNUAL;10
+bal7;emp3;BEREAVEMENT;5
+bal8;emp3;PATERNITY;14
+bal9;emp3;UNPAID;50
+bal10;emp5;SICK;8
+bal11;emp5;ANNUAL;10
+bal12;emp5;BEREAVEMENT;5
+bal13;emp5;PATERNITY;14
+bal14;emp5;UNPAID;50
+

@@ -7,7 +7,7 @@ sap.ui.define([
 ], function (Controller, History, UIComponent, MessageBox, JSONModel) {
     "use strict";
 
-    return Controller.extend("leave.management.controller.ApprovalRequests", {
+    return Controller.extend("leave.management.controller.LeaveBalances", {
         onInit: function () {
             this._oRouter = UIComponent.getRouterFor(this);
             this._oRouter.attachRouteMatched(this.onRouteMatched, this);
@@ -26,13 +26,13 @@ sap.ui.define([
 
         onRouteMatched: function (oEvent) {
             var sRouteName = oEvent.getParameter("name");
-            if (sRouteName === "approvalLeaveRequests") {
+            if (sRouteName === "leaveRequests") {
                 this._loadLeaveRequests();
             }
         },
 
         _loadLeaveRequests: function () {
-            var oTable = this.byId("approvalLeaveRequestsTable");
+            var oTable = this.byId("leaveRequestsTable");
             var oBinding = oTable.getBinding("items");
             if (oBinding) {
                 oBinding.refresh();
@@ -52,41 +52,18 @@ sap.ui.define([
             }
         },
 
-        onApproveRequest: async function (oEvent) {
-            try {
-                const oBindingContext = oEvent.getSource().getBindingContext();
-                const oLeaveRequest = oBindingContext.getObject();
-                const oModel = this.getView().getModel();
-
-                const oContext = oModel.bindContext(`/LeaveRequests(ID=${oLeaveRequest.ID})/LeaveService.approveRequest(...)`);
-
-                await oContext.execute();
-
-                MessageBox.success("Leave request approved successfully");
-                oModel.refresh();
-            } catch (error) {
-                MessageBox.error("Error approving leave request: " + error.message);
-                //console.error("Error:", error);
-            }
+        onApproveRequest: function (oEvent) {
+            var oBindingContext = oEvent.getSource().getBindingContext();
+            var oLeaveRequest = oBindingContext.getObject();
+            
+            this._callAction(oLeaveRequest.ID, "approveRequest", "Leave request approved successfully");
         },
 
-        onRejectRequest:async function (oEvent) {
+        onRejectRequest: function (oEvent) {
+            var oBindingContext = oEvent.getSource().getBindingContext();
+            var oLeaveRequest = oBindingContext.getObject();
             
-            try{
-                var oBindingContext = oEvent.getSource().getBindingContext();
-                var oLeaveRequest = oBindingContext.getObject();
-                const oModel = this.getView().getModel();
-
-                const oContext = oModel.bindContext(`/LeaveRequests(ID=${oLeaveRequest.ID})/LeaveService.rejectRequest(...)`);
-
-                await oContext.execute();
-                MessageBox.success("Leave request rejected successfully");
-                oModel.refresh();
-            }
-            catch(error){
-                MessageBox.error("Error rejecting leave request: " + error.message);
-            }
-            
+            this._callAction(oLeaveRequest.ID, "rejectRequest", "Leave request rejected successfully");
         },
 
         _callAction: function (sId, sAction, sSuccessMessage) {
@@ -103,6 +80,10 @@ sap.ui.define([
                     MessageBox.error("Error: " + oError.message);
                 }
             });
+        },
+
+        onCreateLeaveRequest: function () {
+            this._oRouter.navTo("createLeaveRequest");
         },
 
         onNavBack: function () {

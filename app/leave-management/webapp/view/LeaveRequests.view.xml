@@ -13,7 +13,7 @@
             <Table
                 id="leaveRequestsTable"
                 items="{
-                        path: '/LeaveRequests',
+                        path: '/MyLeaveRequests',
                         parameters: {
                             $expand: 'employee,type,status'
                         },
@@ -41,6 +41,9 @@
                     <Column>
                         <Text text="{i18n>status}"/>
                     </Column>
+                    <Column>
+                        <Text text=""/>
+                    </Column>
                 </columns>
                 <items>
                     <ColumnListItem>
@@ -61,6 +64,12 @@
                                     path: 'status/code',
                                     formatter: '.formatStatusState'
                                 }"/>
+                            <Button
+                                visible="{= ${path: 'isPending', targetType: 'any'} }"
+                                icon="sap-icon://cancel"
+                                text="{i18n>cancel}"
+                                type="Transparent"
+                                press=".onCancelLeaveRequest"/>
                         </cells>
                     </ColumnListItem>
                 </items>

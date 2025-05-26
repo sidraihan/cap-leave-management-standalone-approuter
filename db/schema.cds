@@ -5,6 +5,11 @@ entity Employee : managed {
     key ID : String(100);
     name: String(100);
     email: String(100);
+    gender: String enum{
+        Male = 'M';
+        Female = 'F';
+        Other = 'O';
+    };
     role: String (20); //Employee, Manager, Admin -> Raihan: Will use this later for role based access
     manager: Association to Employee;
     leaveRequests: Composition of many LeaveRequest on leaveRequests.employee = $self;
@@ -20,6 +25,7 @@ entity LeaveRequest :cuid,managed {
     reason: String(255);
     status: Association to LeaveRequestStatus;
     approver: Association to Employee;
+    numberOfDays: Integer;
     virtual isPending : Boolean;
 }
 

@@ -47,6 +47,8 @@ sap.ui.define([
                     return "Error";
                 case "Pending":
                     return "Warning";
+                case "Cancelled":
+                    return "Information";
                 default:
                     return "None";
             }
@@ -93,6 +95,48 @@ sap.ui.define([
             } else {
                 window.location.href = "/";
             }
+        },
+
+        // _refreshBindings: function() {
+        //     // Refresh leave requests table
+        //     this._loadLeaveRequests();
+            
+        //     // Refresh leave balances
+        //     const oModel = this.getView().getModel();
+        //     oModel.bindList("/LeaveBalances").refresh();
+        // },
+
+        onCancelLeaveRequest: function (oEvent) {
+            const oBindingContext = oEvent.getSource().getBindingContext();
+            const oLeaveRequest = oBindingContext.getObject();
+            
+            MessageBox.confirm("Are you sure you want to cancel this leave request?", {
+                title: "Cancel Leave Request",
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.YES,
+                onClose: async (sAction) => {
+                    if (sAction === MessageBox.Action.YES) {
+                        try {
+                            // Get the model
+                            const oModel = this.getView().getModel();
+                            
+                            // Create binding context for the action
+                            const oContext = oModel.bindContext(`/LeaveRequests(ID=${oLeaveRequest.ID})/LeaveService.cancelRequest(...)`);
+                            
+                            // Execute the action
+                            await oContext.execute();
+                            
+                            // Refresh the entire model to ensure all views get updated data
+                            oModel.refresh();
+
+                            MessageBox.success("Leave request cancelled successfully");
+                        } catch (error) {
+                            MessageBox.error("Error cancelling leave request: " + error.message);
+                            console.error("Error:", error);
+                        }
+                    }
+                }
+            });
         }
     });
 }); 
