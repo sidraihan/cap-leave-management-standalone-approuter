@@ -11,6 +11,24 @@ sap.ui.define([
         onInit: function () {
             this._oRouter = UIComponent.getRouterFor(this);
             this._oRouter.attachRouteMatched(this.onRouteMatched, this);
+
+            // The below code is to handle the error messages from the backend in functions like onSubmit. 
+            // The standard try catch does not work for this because the error is not thrown in the try block. 
+            // In OData V4, when an error occurs during a ListBinding.create(), the error is not thrown in await oContext.created() if it's considered a transient error — it logs it in the console and retries the request unless you handle it explicitly.
+            const oMessageManager = sap.ui.getCore().getMessageManager();
+            const oMessageModel = oMessageManager.getMessageModel();
+
+            oMessageModel.bindList("/").attachChange(function (oEvent) {
+                const aMessages = oEvent.getSource().getContexts().map(oCtx => oCtx.getObject());
+
+                const oErrorMessage = aMessages.find(msg => msg.type === "Error");
+                if (oErrorMessage) {
+                    MessageBox.error(oErrorMessage.message);
+                }
+            });
+
+            // Register your view for message propagation
+            oMessageManager.registerObject(this.getView(), true);
         },
 
         onRouteMatched: function (oEvent) {
@@ -55,45 +73,37 @@ sap.ui.define([
         onSubmit: async function () {
             if (!this._validateForm()) return;
         
-            const oModel = this.getView().getModel();
-            //console.log("Model:", oModel);
-
             try {
+                const oModel = this.getView().getModel();
                 const startDate = this._formatDate(this.byId("startDatePicker").getDateValue());
                 const endDate = this._formatDate(this.byId("endDatePicker").getDateValue());
                 
-                //console.log("Start Date:", startDate);
-                //console.log("End Date:", endDate);
-
-                const mPayload = {
+                // Get the list binding
+                const oListBinding = oModel.bindList("/LeaveRequests");
+                
+                // Prepare the data
+                const oData = {
                     startDate: startDate,
                     endDate: endDate,
                     type_code: this.byId("leaveTypeSelect").getSelectedKey(),
                     reason: this.byId("reasonTextArea").getValue()
                 };
-                
-                //console.log("Payload:", mPayload);
 
-                // Create a context for the action
-                const oContext = oModel.bindContext("/createLeave(...)");
-                
-                // Set the parameters for the action
-                Object.entries(mPayload).forEach(([key, value]) => {
-                    oContext.setParameter(key, value);
-                });
+                // Create the context and set the data
+                const oContext = oListBinding.create(oData);
 
-                // Execute the action
-                await oContext.execute();
-
+                // Wait for the backend to respond
+                await oContext.created();
+                oModel.refresh();
+                // Show success message and navigate back
                 MessageBox.success("Leave request created successfully", {
                     onClose: () => {
                         this.onNavBack();
-                        oModel.refresh(); // Refresh model so that the latest balance is reflected in the Leave Balance view
+                        oModel.refresh();
                     }
                 });
             } catch (error) {
-                MessageBox.error("Error creating leave request: " + error.message);
-                console.error("Error:", error);
+                MessageBox.error(error.message);
             }
         },
 

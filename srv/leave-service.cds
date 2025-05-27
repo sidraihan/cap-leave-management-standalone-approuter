@@ -2,13 +2,6 @@ using {leave.management as my} from '../db/schema';
 
 service LeaveService {
 
-    action createLeave(
-        startDate : Date,
-        endDate   : Date,
-        type_code : String,
-        reason    : String
-    ) returns Boolean;
-
     @cds.redirection.target entity LeaveRequests as projection on my.LeaveRequest actions{ 
         action approveRequest();
         action rejectRequest();
@@ -68,10 +61,6 @@ service LeaveService {
             to: 'Employee'
         },
         {
-            grant: 'createLeave',
-            to: 'Employee'
-        },
-        {
             grant: 'UPDATE',
             to: 'Employee'
         },
@@ -97,10 +86,6 @@ service LeaveService {
             grant: 'READ', 
             to: 'Employee',
             where: 'employee_ID = $user'
-        },
-        {
-            grant: 'READ',
-            to: 'Manager'
         },
         { 
             grant: '*', 

@@ -1,5 +1,5 @@
 const cds = require('@sap/cds');
-const { parseISO, eachDayOfInterval, isWeekend } = require('date-fns');
+const { parseISO, eachDayOfInterval, isWeekend, nextDay } = require('date-fns');
 const { SELECT, INSERT, UPDATE, DELETE } = require('@sap/cds/lib/ql/cds-ql');
 console.log("File is leaded")
 module.exports = async function (srv){
@@ -103,81 +103,97 @@ module.exports = async function (srv){
         });
     });
 
-    srv.on('createLeave', async (req) => {
-        console.log("createLeave is being called");
-        //console.log("Request body:", req.data);
-
+    // CREATE handler for LeaveRequests
+    srv.on('CREATE', 'LeaveRequests', async (req) => {
+        console.log("CREATE LeaveRequest is being called");
+        console.log("Request data:", req.data);
+        try{
         if (!req.data) {
-            return req.error(400, "No leave request data provided");
+            return req.reject(400, "No leave request data provided");
         }
 
+        const {ID, type_code, startDate, endDate, reason } = req.data; //ID is generated as soon as the before handler is called and it is then added to the req.data, so we need to pass it in the entries which will be inserted into the database
         const employee_ID = req.user.id;
-        const { type_code, startDate, endDate, reason } = req.data;
 
-        const currLeaveBalance = await SELECT.one.from(LeaveBalance).where({employee_ID: employee_ID, type_code: type_code})
-        
         if (!type_code || !startDate || !endDate || !reason) {
-            return req.error(400, "Missing required fields: type_code, startDate, endDate, and reason are required");
+            return req.reject(400, "Missing required fields: type_code, startDate, endDate, and reason are required");
         }
 
-        const status_code = 'Pending';
+        const tx = cds.transaction(req);
 
-        try {
-            const tx = cds.transaction(req);
+        //try {
+            // Get current leave balance
+            const currLeaveBalance = await tx.run(
+                SELECT.one.from(LeaveBalance)
+                    .where({ 
+                        employee_ID: employee_ID, 
+                        type_code: type_code 
+                    })
+            );
+
+            if (!currLeaveBalance) {
+                return req.reject(400, "Leave balance not found for this leave type");
+            }
 
             // Get employee's manager ID
             const employee = await tx.run(
-                SELECT.one.from(Employee).where({ ID: employee_ID })
+                SELECT.one.from(Employee)
+                    .where({ ID: employee_ID })
             );
 
             if (!employee || !employee.manager_ID) {
-                return req.error(400, "Employee's manager not found");
+                return req.reject(400, "Employee's manager not found");
             }
+
+            // Calculate working days
             const start = parseISO(startDate);
             const end = parseISO(endDate);
-            const allDays = eachDayOfInterval({ start, end }); // This will return an array of all the days between leave start and leave end dates
-            const workingDays = allDays.filter(date => !isWeekend(date)).length; // This will return the number of working days between leave start and leave end date
+            const allDays = eachDayOfInterval({ start, end });
+            const workingDays = allDays.filter(date => !isWeekend(date)).length;
 
+            if (currLeaveBalance.balance < workingDays) {
+                return req.error(400, "You don't have enough leave balance to request this leave");
+            }
+            const status_code = 'Pending';
             // Create the leave request
-            await tx.run(
+            const result = await tx.run(
                 INSERT.into(LeaveRequest).entries({
-                    employee_ID,
+                    ID,
                     type_code,
                     startDate,
                     endDate,
                     reason,
+                    employee_ID,
                     status_code,
                     approver_ID: employee.manager_ID,
                     numberOfDays: workingDays
                 })
             );
 
-            
+            // Update leave balance
+            await tx.run(
+                UPDATE.entity(LeaveBalance)
+                    .with({ balance: currLeaveBalance.balance - workingDays })
+                    .where({ ID: currLeaveBalance.ID })
+            );
 
-            if(currLeaveBalance.balance < workingDays){
-                return req.error(400, "You don't have enough leave balance to request this leave");
-            }
+            // Return only the necessary fields to avoid circular references
+            return {
+                ID: ID,
+                startDate: startDate,
+                endDate: endDate,
+                type_code: type_code,
+                reason: reason,
+                status_code: status_code,
+                employee_ID: employee_ID,
+                approver_ID: employee.manager_ID,
+                numberOfDays: workingDays
+            };
 
-            if(currLeaveBalance){
-                await tx.run(
-                    UPDATE.entity(LeaveBalance)
-                    .with({balance: currLeaveBalance.balance - workingDays})
-                    .where({ID: currLeaveBalance.ID})
-                )
-            }
-
-            return true;
-        } 
-        catch (error) {
+        } catch (error) {
             console.error("Error creating leave request:", error);
-            return req.error(500, "Error creating leave request: " + error.message);
+            return req.reject(400, "Error creating leave request: " + error.message);
         }
-    });
-
-    srv.on('READ','LeaveBalances', async (req) =>{
-        const tx = cds.transaction(req);
-        const results = await tx.run(SELECT.from(LeaveBalance).columns(r=>{r`.*`,r.type(asi=>{asi`.*`})}).where({employee_ID: req.user.id}))
-        return results;
     });
 
     // Cancel action
@@ -206,13 +222,6 @@ module.exports = async function (srv){
             if (leaveRequest.status_code !== 'Pending' && leaveRequest.status_code !== 'Approved') {
                 return req.error(400, "Only pending/approved leave requests can be cancelled");
             }
-
-            // Calculate working days to restore to leave balance
-            // const start = parseISO(leaveRequest.startDate);
-            // const end = parseISO(leaveRequest.endDate);
-            // const allDays = eachDayOfInterval({ start, end });
-            // const workingDays = allDays.filter(date => !isWeekend(date)).length;
-
             // Get current leave balance
             const leaveBalance = await tx.run(
                 SELECT.one.from(LeaveBalance)

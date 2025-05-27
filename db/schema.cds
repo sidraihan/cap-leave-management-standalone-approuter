@@ -17,7 +17,6 @@ entity Employee : managed {
 }
 
 entity LeaveRequest :cuid,managed {
-    //key ID: String(25);
     employee: Association to Employee;
     type: Association to LeaveType;
     startDate: Date;
