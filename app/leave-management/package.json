@@ -8,14 +8,23 @@
     "sapui5"
   ],
   "main": "webapp/index.html",
+  "dependencies": {
+    "serve": "^14.2.4"
+  },
   "devDependencies": {
     "@sap/ux-ui5-tooling": "^1.17.5",
-    "@ui5/cli": "^3.11.6"
+    "@ui5/cli": "^3.11.6",
+    "ui5-task-zipper": "^3"
   },
   "scripts": {
     "deploy-config": "npx -p @sap/ux-ui5-tooling fiori add deploy-config cf",
     "start": "npx serve dist",
     "build": "ui5 build preload --clean-dest --config ui5-deploy.yaml",
     "build-local": "ui5 build preload --clean-dest"
+  },
+  "ui5": {
+    "dependencies": [
+      "ui5-task-zipper"
+    ]
   }
 }

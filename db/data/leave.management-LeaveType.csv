@@ -1,7 +1,7 @@
 code;name;
-ANNUAL;Annual Leave
-SICK;Sick Leave
-UNPAID;Unpaid Leave
-MATERNITY;Maternity Leave
-PATERNITY;Paternity Leave
-BEREAVEMENT;Bereavement Leave
+ANNUAL;Annual Leave;
+SICK;Sick Leave;
+UNPAID;Unpaid Leave;
+MATERNITY;Maternity Leave;
+PATERNITY;Paternity Leave;
+BEREAVEMENT;Bereavement Leave;

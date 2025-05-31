@@ -1,34 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mvc:View
-    controllerName="leave.management.controller.LeaveRequests"
+    controllerName="leave.management.controller.ApprovalRequests"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core">
     <Page
-        title="{i18n>leaveRequestsTitle}"
+        title="{i18n>approvalLeaveRequestsTitle}"
         showNavButton="true"
-        navButtonPress=".onNavBack"
-        busy="{viewModel>/busy}"
-        busyIndicatorDelay="{viewModel>/delay}">
+        navButtonPress=".onNavBack">
         <content>
             <Table
-                id="leaveRequestsTable"
+                id="approvalLeaveRequestsTable"
                 items="{
-                        path: '/MyLeaveRequests',
+                        path: '/ApprovalLeaveRequests',
                         parameters: {
-                            $expand: 'employee,type,status',
-                            $$updateGroupId: 'leaveRequests'
+                            $expand: 'employee,type,status'
                         },
                         sorter: {
                             path: 'startDate',
                             descending: true
                         }
                     }"
-                mode="MultiSelect"
                 growing="true"
-                growingThreshold="10"
-                updateFinished=".onUpdateFinished">
+                growingThreshold="10">
                 <columns>
                     <Column>
                         <Text text="{i18n>employeeName}"/>
@@ -46,7 +41,7 @@
                         <Text text="{i18n>status}"/>
                     </Column>
                     <Column>
-                        <Text text=""/>
+                        <Text text="{i18n>actions}"/>
                     </Column>
                 </columns>
                 <items>
@@ -68,31 +63,23 @@
                                     path: 'status/code',
                                     formatter: '.formatStatusState'
                                 }"/>
-                            <Button
-                                visible="{= ${path: 'isPending', targetType: 'any'} }"
-                                icon="sap-icon://cancel"
-                                text="{i18n>cancel}"
-                                type="Transparent"
-                                press=".onCancelLeaveRequest"/>
+                            <HBox>
+                                <Button
+                                    visible="{= ${path: 'isPending', targetType: 'any'} }"
+                                    icon="sap-icon://accept"
+                                    type="Accept"
+                                    press=".onApproveRequest"
+                                    class="sapUiTinyMarginEnd"/>
+                                <Button
+                                    visible="{= ${path: 'isPending', targetType: 'any'} }"
+                                    icon="sap-icon://decline"
+                                    type="Reject"
+                                    press=".onRejectRequest"/>
+                            </HBox>
                         </cells>
                     </ColumnListItem>
                 </items>
-                <noData>
-                    <MessageStrip
-                        text="No leave requests found. Please refresh the page."
-                        type="Information"
-                        showIcon="true"/>
-                </noData>
             </Table>
         </content>
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer/>
-                <Button
-                    text="{i18n>createLeaveRequest}"
-                    type="Emphasized"
-                    press=".onCreateLeaveRequest"/>
-            </Toolbar>
-        </footer>
     </Page>
 </mvc:View> 

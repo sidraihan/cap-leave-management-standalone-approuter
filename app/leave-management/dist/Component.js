@@ -1,0 +1,2 @@
+sap.ui.define(["sap/ui/core/UIComponent","sap/ui/Device","sap/ui/model/json/JSONModel"],function(e,t,i){"use strict";return e.extend("leave.management.Component",{metadata:{manifest:"json"},init:function(){e.prototype.init.apply(this,arguments);this.getRouter().initialize();var n=new i(t);n.setDefaultBindingMode("OneWay");this.setModel(n,"device")}})});
+//# sourceMappingURL=Component.js.map

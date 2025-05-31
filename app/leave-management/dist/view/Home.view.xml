@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mvc:View
+    controllerName="leave.management.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <Page showHeader="false">
+        <content>
+            <VBox class="contentWrapper" alignItems="Center">
+                <Title 
+                    text="Welcome to Leave Management System"
+                    wrapping="true"
+                    class="sapUiSmallMargin sapUiMediumMarginTop"
+                    level="H1"
+                    textAlign="Center"/>
+                <HBox width="60%" alignItems="Center" justifyContent="Center">
+                    <HBox width="100%" class="customDivider sapUiMediumMarginBottom sapUiMediumMarginTop"/>
+                </HBox>
+                <FlexBox 
+                    direction="Row" 
+                    wrap="Wrap" 
+                    alignItems="Center" 
+                    justifyContent="Center"
+                    items="{tiles>/tiles}">
+                    <GenericTile
+                        class="sapUiMediumMargin tileLayout"
+                        header="{tiles>title}"
+                        subheader="{tiles>info}"
+                        frameType="OneByOne"
+                        width="14rem"
+                        press="onTilePress">
+                        <TileContent>
+                            <ImageContent src="{tiles>icon}" />
+                        </TileContent>
+                    </GenericTile>
+                </FlexBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View> 

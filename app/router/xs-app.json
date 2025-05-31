@@ -1,0 +1,42 @@
+{
+  "authenticationMethod": "route",
+  "welcomeFile": "index.html",
+  "logout": {
+      "logoutEndpoint": "/do/logout",
+      "logoutPage": "/"
+  },
+  "routes": [
+      {
+          "source": "^/resources/(.*)$",
+          "target": "/resources/$1",
+          "destination": "ui5",
+          "authenticationType": "none"
+      },
+      {
+          "source": "^/test-resources/(.*)$",
+          "target": "/test-resources/$1",
+          "destination": "ui5",
+          "authenticationType": "none"
+      },
+      {
+          "source": "^/user-api(.*)",
+          "target": "$1",
+          "service": "sap-approuter-userapi"
+      },
+      {
+          "source": "^/odata/(.*)$",
+          "target": "/odata/$1",
+          "destination": "srv-api",
+          "csrfProtection": true,
+          "authenticationType": "xsuaa"
+      },
+      {
+          "source": "^/(.*)$",
+          "target": "$1",
+          "localDir": ".",
+          "cacheControl": "no-cache, no-store, must-revalidate",
+          "authenticationType": "xsuaa"
+      }
+  ]
+}
+  

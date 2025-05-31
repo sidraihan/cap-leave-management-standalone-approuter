@@ -8,11 +8,12 @@
   "dependencies": {
     "@sap/cds": "^8",
     "@sap/cds-dk": "^8",
-    "@sap/xssec": "^3",
+    "@sap/xssec": "^4",
     "date-fns": "^4.1.0",
     "express": "^4",
     "passport": "^0",
-    "sqlite3": "^5"
+    "sqlite3": "^5",
+    "@cap-js/hana": "^1"
   },
   "devDependencies": {
     "@sap/cds-dk": "^8",
@@ -20,10 +21,11 @@
     "ui5-middleware-livereload": "^0.8.0"
   },
   "scripts": {
-    "start": "cds run",
+    "start": "cds-serve",
     "watch": "cds watch",
-    "build": "ui5 build",
-    "deploy": "cds build --production && cf push",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "undeploy": "cf undeploy cap-leave-management-app --delete-services --delete-service-keys --delete-service-brokers",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
     "ui5:serve": "ui5 serve --config ui5.yaml"
   },
   "cds": {
@@ -32,10 +34,7 @@
         "kind": "sqlite"
       },
       "auth": {
-        "[production]": {
-          "kind": "xsuaa"
-        },
-        "[development]": {
+        "[hybrid]": {
           "kind": "mocked",
           "users": {
             "admin": {
@@ -72,7 +71,21 @@
             }
           }
         }
-      }
+      },
+      "[production]": {
+        "auth": {
+          "kind": "xsuaa"
+        },
+        "db": {
+          "kind": "hana"
+        }
+      },
+      "destinations": true,
+      "html5-runtime": true,
+      "workzone": true
+    },
+    "sql": {
+      "native_hana_associations": false
     }
   },
   "ui5": {

@@ -7,16 +7,10 @@ sap.ui.define([
 ], function (Controller, History, UIComponent, MessageBox, JSONModel) {
     "use strict";
 
-    return Controller.extend("leave.management.controller.LeaveBalances", {
+    return Controller.extend("leave.management.controller.ApprovalRequests", {
         onInit: function () {
             this._oRouter = UIComponent.getRouterFor(this);
             this._oRouter.attachRouteMatched(this.onRouteMatched, this);
-
-            // Initialize busy indicator state
-            this.getView().setModel(new JSONModel({
-                busy: false,
-                delay: 0
-            }), "viewModel");
         },
 
         formatDate: function(sDate) {
@@ -32,31 +26,16 @@ sap.ui.define([
 
         onRouteMatched: function (oEvent) {
             var sRouteName = oEvent.getParameter("name");
-            if (sRouteName === "leaveBalances") {
-                this._loadLeaveBalances();
+            if (sRouteName === "approvalLeaveRequests") {
+                this._loadLeaveRequests();
             }
         },
 
-        _loadLeaveBalances: async function () {
-            try {
-                const oViewModel = this.getView().getModel("viewModel");
-                oViewModel.setProperty("/busy", true);
-
-                const oTable = this.byId("leaveBalancesTable");
-                const oBinding = oTable.getBinding("items");
-
-                if (oBinding) {
-                    // Suspend event handling until refresh is complete
-                    oBinding.attachEventOnce("dataReceived", () => {
-                        oViewModel.setProperty("/busy", false);
-                    });
-
-                    // Force reload of data
-                    await oBinding.refresh();
-                }
-            } catch (error) {
-                MessageBox.error("Error loading leave balances: " + error.message);
-                this.getView().getModel("viewModel").setProperty("/busy", false);
+        _loadLeaveRequests: function () {
+            var oTable = this.byId("approvalLeaveRequestsTable");
+            var oBinding = oTable.getBinding("items");
+            if (oBinding) {
+                oBinding.refresh();
             }
         },
 
@@ -73,18 +52,41 @@ sap.ui.define([
             }
         },
 
-        onApproveRequest: function (oEvent) {
-            var oBindingContext = oEvent.getSource().getBindingContext();
-            var oLeaveRequest = oBindingContext.getObject();
-            
-            this._callAction(oLeaveRequest.ID, "approveRequest", "Leave request approved successfully");
+        onApproveRequest: async function (oEvent) {
+            try {
+                const oBindingContext = oEvent.getSource().getBindingContext();
+                const oLeaveRequest = oBindingContext.getObject();
+                const oModel = this.getView().getModel();
+
+                const oContext = oModel.bindContext(`/LeaveRequests(ID=${oLeaveRequest.ID})/LeaveService.approveRequest(...)`);
+
+                await oContext.execute();
+
+                MessageBox.success("Leave request approved successfully");
+                oModel.refresh();
+            } catch (error) {
+                MessageBox.error("Error approving leave request: " + error.message);
+                //console.error("Error:", error);
+            }
         },
 
-        onRejectRequest: function (oEvent) {
-            var oBindingContext = oEvent.getSource().getBindingContext();
-            var oLeaveRequest = oBindingContext.getObject();
+        onRejectRequest:async function (oEvent) {
             
-            this._callAction(oLeaveRequest.ID, "rejectRequest", "Leave request rejected successfully");
+            try{
+                var oBindingContext = oEvent.getSource().getBindingContext();
+                var oLeaveRequest = oBindingContext.getObject();
+                const oModel = this.getView().getModel();
+
+                const oContext = oModel.bindContext(`/LeaveRequests(ID=${oLeaveRequest.ID})/LeaveService.rejectRequest(...)`);
+
+                await oContext.execute();
+                MessageBox.success("Leave request rejected successfully");
+                oModel.refresh();
+            }
+            catch(error){
+                MessageBox.error("Error rejecting leave request: " + error.message);
+            }
+            
         },
 
         _callAction: function (sId, sAction, sSuccessMessage) {
@@ -101,10 +103,6 @@ sap.ui.define([
                     MessageBox.error("Error: " + oError.message);
                 }
             });
-        },
-
-        onCreateLeaveRequest: function () {
-            this._oRouter.navTo("createLeaveRequest");
         },
 
         onNavBack: function () {

@@ -36,7 +36,7 @@ entity LeaveBalance : cuid,managed {
 }
 
 entity LeaveType : CodeList {
-    key code: String(10);
+    key code: String(25);
     name: String(100);
 }
 

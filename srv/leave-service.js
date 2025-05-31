@@ -3,6 +3,36 @@ const { parseISO, eachDayOfInterval, isWeekend, nextDay } = require('date-fns');
 const { SELECT, INSERT, UPDATE, DELETE } = require('@sap/cds/lib/ql/cds-ql');
 console.log("File is leaded")
 module.exports = async function (srv){
+    // Add user attribute mapping middleware
+    srv.before('*', async (req) => {
+        const email = req.user.attr.email;
+        console.log('Request path:', req.path);
+        console.log('Request method:', req.method);
+        console.log('User attributes:', req.user.attr);
+        console.log('User object::', req.user);
+        
+        if (email) {
+            // Map the email from JWT to user.id for authorization
+            req.user.id = email;
+            console.log('User mapped:', req.user.id);
+           }   
+             else {
+                console.warn('No email found in user attributes');
+                console.log('Full user object:', req.user);
+                console.log('User roles:', !(req.user.roles.Admin));
+            }
+        
+    });
+
+    // Add debug middleware for batch requests
+    srv.before('READ', '*', async (req) => {
+        if (req.headers && req.headers['x-http-method'] === 'BATCH') {
+            console.log('Processing batch request for:', req.path);
+            console.log('Current user context:', req.user);
+            console.log('User role:', req.user.role);
+        }
+    });
+
     const {LeaveRequest,Employee,LeaveBalance} = cds.entities;
 
     //Approve action
@@ -13,8 +43,9 @@ module.exports = async function (srv){
         //console.log("ID from req is:"+ID);
         const user = req.user;
         //console.log(user);
+        console.log("Req.user.role inside approve request is:", req.user.role);
 
-        if(!(approver_ID == req.user.id) && req.user.id !== 'admin'){
+        if(!(req.user.roles.Admin) && !(approver_ID === req.user.id) ){
             return req.error(403, "You cannot perform this action, as you are not the leave applier's manager")
         }
 
@@ -33,7 +64,7 @@ module.exports = async function (srv){
         const {approver_ID,numberOfDays,type_code,employee_ID} = await SELECT.one.from(LeaveRequest).where({ID: ID});
         const user = req.user;
 
-        if(!(approver_ID == req.user.id) && req.user.id !== 'admin'){
+        if(!(req.user.roles.Admin) && !(approver_ID === req.user.id) ){
             return req.error(403, "You cannot perform this action, as you are not the leave applier's manager")
         }
 
@@ -53,10 +84,12 @@ module.exports = async function (srv){
     });
 
     srv.on('READ', 'MyLeaveRequests',async (req) => {
+        console.log('Reading MyLeaveRequests');
+        console.log('User context:', req.user);
         // Let CAP handle the query including pagination
         const tx = cds.transaction(req);
         
-        if (req.user.id === 'admin') {
+        if (req.user.role === 'Admin') {
             // For admin, just run the query as is
             return tx.run(req.query);
         } else {
@@ -77,7 +110,7 @@ module.exports = async function (srv){
         // Let CAP handle the query including pagination
         const tx = cds.transaction(req);
         
-        if (req.user.id === 'admin') {
+        if (req.user.role === 'Admin') {
             // For admin, just run the query as is
             return tx.run(req.query);
         } else {
@@ -92,14 +125,15 @@ module.exports = async function (srv){
     srv.after('READ', 'ApprovalLeaveRequests', (results, req) => {
         const entries = Array.isArray(results) ? results : [results];
         entries.forEach(row => {
-            row.isPending = row.status_code === 'Pending';
+            row.isPending = row.status.code === 'Pending';
         });
     });
+
 
     srv.after('READ', 'MyLeaveRequests', (results, req) => {
         const entries = Array.isArray(results) ? results : [results];
         entries.forEach(row => {
-            row.isPending = row.status_code === 'Pending' || row.status_code === 'Approved';
+            row.isPending = row.status.code === 'Pending' || row.status.code === 'Approved';
         });
     });
 
@@ -114,6 +148,13 @@ module.exports = async function (srv){
 
         const {ID, type_code, startDate, endDate, reason } = req.data; //ID is generated as soon as the before handler is called and it is then added to the req.data, so we need to pass it in the entries which will be inserted into the database
         const employee_ID = req.user.id;
+        console.log("Req.user.id is:", employee_ID);
+        console.log("Req.user.role is:", req.user.role);
+        console.log("Req.user.email is:", req.user.email);
+        console.log("Req.user.attr.email is:", req.user.attr.email);
+        console.log("Req.user.name is:", req.user.name);          // Full display name
+        console.log("Req.user.locale is:", req.user.locale);        // User's preferred locale
+        console.log("Req.user.scopes is:", req.user.scopes);        // List of user scopes/roles
 
         if (!type_code || !startDate || !endDate || !reason) {
             return req.reject(400, "Missing required fields: type_code, startDate, endDate, and reason are required");
@@ -250,5 +291,18 @@ module.exports = async function (srv){
             return req.error(500, "Error cancelling leave request: " + error.message);
         }
     });
+
+    // Add logging to LeaveBalances READ
+    // srv.on('READ', 'LeaveBalances', async (req) => {
+    //     console.log('Reading LeaveBalances');
+    //     console.log('User context:', req.user);
+    //     const tx = cds.transaction(req);
+    //     const results = await tx.run(
+    //         SELECT.from(LeaveBalance)
+    //             .where({ employee_ID: req.user.id })
+    //     );
+    //     console.log('LeaveBalances results:', results);
+    //     return results;
+    // });
 }
     
