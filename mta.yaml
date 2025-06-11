@@ -104,7 +104,7 @@ modules:
 
   - name: cap-leave-management-app
     type: approuter.nodejs
-    path: app/router
+    path: app/leave-management/router
     build-parameters:
       ignore:
         - 'node_modules/'

@@ -17,4 +17,4 @@ builder:
       configuration:
         archiveName: leave-management
         additionalFiles:
-          - xs-app.json
+          - webapp/xs-app.json
